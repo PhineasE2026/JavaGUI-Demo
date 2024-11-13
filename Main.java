@@ -9,7 +9,7 @@ public class Main {
     private static JButton upButton, rightButton, downButton, leftButton, yesButton, noButton, restartButton;
     private static String state;
     private static String scenario;
-    private static String startText = "You're standing at the SW entrance of Central Park, with Columbus Circle behind you. Which way do you want to go? (Click a DIRECTION)";
+    private static String startText = "It's the apocalypse, and you're currently attending a register in Costco. People are bustling around the store, stacking on top of each other. Will you stay at the CostCo? (Click YES/NO)";
 
     // *** STORY PROGRESSION SECTION ***
     static class DirectionListener implements ActionListener {
@@ -33,25 +33,31 @@ public class Main {
             else if (state.equals("s1_tavern") && scenario.equals("s1_noWedding")) {
                 processSheepsMeadow();
             }
+            else if (state.equals("s2_castle")) {
+                processLeavingChoice();
+            }
+            else if (state.equals("s2_bread")) {
+                processBreadChoice();
+            }
             // ADD MORE ELSE IF STATEMENTS FOR FURTHER STORY BRANCHES!!!
         }
 
         private void processStateStart() {
-            if (command.equals("Up")) {
-                storyArea.setText("You walk north to Tavern on the Green and see a lively wedding celebration. Do you want to crash it? (Click YES/NO)");
-                toggleDirectionButtons(false);
-                toggleYesNoButtons(true);
+            if (command.equals("Yes")) {
+                storyArea.setText("You took the cash from the register and crouched under the desk. You see a fire axe over by the wall left, snacks and food forward, and a horde of zombies that broke in from your right. (Click a DIRECTION)");
+                toggleDirectionButtons(true);
+                toggleYesNoButtons(false);
                 state = "s1_tavern";
                 scenario = "s1_none";
             }
         }
 
         private void processWeddingChoice() {
-            if (command.equals("Yes")) {
-                storyArea.setText("You attempt to sneak into the wedding and promptly get arrested! Game over.");
+            if (command.equals("Right")) {
+                storyArea.setText("You rush the zombies and are immediately overwhelmed. Game over. (RESTART)");
                 endGame();
-            } else if (command.equals("No")) {
-                storyArea.setText("You pass the wedding and keep walking, reaching Sheep's Meadow. It's peaceful here. (Click a DIRECTION)");
+            } else if (command.equals("Left")) {
+                storyArea.setText("You sprinted over to the end of the registers and used your mega elbow attack to break the glass. You reached in for the axe and took it out, holding it high above your head. Will you go left and leave the store with your axe, or go right and go to the bread aisle? (Click a DIRECTION)");
                 toggleYesNoButtons(false);
                 toggleDirectionButtons(true);
                 scenario = "s1_noWedding";
@@ -59,22 +65,68 @@ public class Main {
         }
 
         private void processSheepsMeadow() {
-            if (command.equals("Up")) {
-                storyArea.setText("You walk further north and see Belvedere Castle in the distance. Do you want to go inside?");
+            if (command.equals("Right")) {
+                storyArea.setText("You slide over to the bread aisle but a horde of zombies pops out from around the corner! Hero... I'm afraid you may not survive this one... You have to use your secret ability... (Click YES/NO)");
                 toggleDirectionButtons(false);
                 toggleYesNoButtons(true);
+                state = "s2_bread";
+            }
+            else if (command.equals("Left")) {
+                storyArea.setText("You barreled out through the front doors and rose your axe at the zombies. They cowered away in fear. Go up to the warehouse or right to the beachfront? (CLICK A DIRECTION)");
+                toggleDirectionButtons(true);
+                toggleYesNoButtons(false);
                 state = "s2_castle";
+            }
+        }
+
+        private void processLeavingChoice() {
+            if (command.equals("Up")) {
+                storyArea.setText("After a long walk, you made it to the warehouse. As you opened the doors, there was a sudden flash. Four hundred zombies dropped from the roof and obliterated you. Game over. (RESTART)");
+                endGame();
+            }
+            else if (command.equals("Right")) {
+                storyArea.setText("After a short stroll, you made it to the beachfront. There's no one there. You sat down in the sand and watched the waves. You're finally at peace. Good ending. (RESTART)");
+                endGame();
+            }
+        }
+
+        private void processBreadChoice() {
+            if (command.equals("Yes")) {
+                storyArea.setText("Berserker mode activated. Corrupt the child. Kill them all.");
+                try {
+                   Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                storyArea.setText("Loading...");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                storyArea.setText("Loading...");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                storyArea.setText("404 Secret Not Found. Error ending achieved. (RESTART)");
+                endGame();
+            }
+            else if (command.equals("No")) {
+                storyArea.setText("Oh. That's awkward. You'll just do nothing then. Bad ending achieved. (RESTART)");
+                endGame();
             }
         }
     }
 
     // *** GUI CUSTOMIZATION BELOW ***
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Central Park Adventure");
+        JFrame frame = new JFrame("The Stumbling Deceased");
         JPanel canvas = new JPanel();
         canvas.setPreferredSize(new Dimension(500, 500));
         canvas.setLayout(new BorderLayout());
-        Color backgroundColor = new Color(0xbee1e6);
+        Color backgroundColor = new Color(0x000000);
         canvas.setBackground(backgroundColor);
 
         JPanel contentPanel = new JPanel();
@@ -85,7 +137,7 @@ public class Main {
         imagePanel.setBackground(backgroundColor);
 
         JLabel imageLabel = new JLabel();
-        ImageIcon imageIcon = new ImageIcon("CentralPark.png");
+        ImageIcon imageIcon = new ImageIcon("zombie.jpg");
         Image scaledImage = imageIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
         imageLabel.setIcon(new ImageIcon(scaledImage));
         imagePanel.add(imageLabel);
@@ -141,8 +193,12 @@ public class Main {
         gbc.gridx = 4; gbc.gridy = 2;
         buttonPanel.add(restartButton, gbc);
 
-        yesButton.setEnabled(false);
-        noButton.setEnabled(false);
+        upButton.setEnabled(false);
+        downButton.setEnabled(false);
+        leftButton.setEnabled(false);
+        rightButton.setEnabled(false);
+        yesButton.setEnabled(true);
+        noButton.setEnabled(true);
 
         canvas.add(buttonPanel, BorderLayout.SOUTH);
         frame.add(canvas);
@@ -169,8 +225,8 @@ public class Main {
         storyArea.setText(startText);
         state = "start";
         scenario = "s0";
-        toggleDirectionButtons(true);
-        toggleYesNoButtons(false);
+        toggleDirectionButtons(false);
+        toggleYesNoButtons(true);
     }
 
     private static void toggleDirectionButtons(boolean enable) {
